@@ -1,0 +1,30 @@
+BootStrap: docker
+From: r-base:3.5.0
+
+%environment
+    PATH=/app/bubble/scripts:$PATH
+
+%runscript
+    #exec /usr/bin/Rscript /app/bubble/scripts/centrifuge_bubble.r "$@"
+    echo Hi
+
+%post
+    apt-get update
+    apt-get install -y git locales curl libcurl4-gnutls-dev libxml2-dev
+    echo "LC_ALL=en_US.UTF-8" >> /etc/environment
+    echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
+    echo "LANG=en_US.UTF-8" > /etc/locale.conf
+    locale-gen en_US.UTF-8
+
+    cat << EOF > .Rprofile
+local({
+  r = getOption("repos")
+  r["CRAN"] = "http://mirrors.nics.utk.edu/cran/"
+  options(repos = r)
+})
+EOF
+    #/usr/bin/Rscript /app/bubble/scripts/install.r
+
+    mkdir /home1
+    mkdir /work
+    mkdir /scratch
